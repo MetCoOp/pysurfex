@@ -255,7 +255,7 @@ class BufrObservationSet(surfex.obs.ObservationSet):
                                             value = value * 0.01
                                         except:
                                             value = np.nan
-                            elif var == "airTemperatureAt2M":
+                            elif var == "airTemperatureAt2M" or var == "airTemperature":
                                 if np.isnan(t2m):
                                     if not np.isnan(t):
                                         value = t
