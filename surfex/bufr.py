@@ -67,6 +67,7 @@ class BufrObservationSet(surfex.obs.ObservationSet):
                 keys.append("/heightOfSensorAboveLocalGroundOrDeckOfMarinePlatform=1.5/dewpointTemperature")
             elif var == "relativeHumidity":
                 keys.append("airTemperature")
+                keys.append("#1#airTemperature")
                 keys.append("dewpointTemperature")
             elif var == "airTemperatureAt2M":
                 keys.append("airTemperatureAt2M")
@@ -74,6 +75,7 @@ class BufrObservationSet(surfex.obs.ObservationSet):
                 keys.append("/heightOfSensorAboveLocalGroundOrDeckOfMarinePlatform=1.5/airTemperature")
             elif var == "airTemperature":
                 keys.append("airTemperature")
+                keys.append("#1#airTemperature")
             else:
                 keys.append(var)
             nerror.update({var: 0})
@@ -197,7 +199,7 @@ class BufrObservationSet(surfex.obs.ObservationSet):
                         block_number = val
                     if key == "airTemperatureAt2M":
                         t2m = val
-                    if key == "airTemperature":
+                    if key == "airTemperature"  or (np.isnan(t2m) and key == "#1#airTemperature"):
                         t2m = val
                     if key == "/heightOfSensorAboveLocalGroundOrDeckOfMarinePlatform=2/airTemperature" or \
                             key == "/heightOfSensorAboveLocalGroundOrDeckOfMarinePlatform=1.5/airTemperature":
@@ -255,7 +257,7 @@ class BufrObservationSet(surfex.obs.ObservationSet):
                                             value = value * 0.01
                                         except:
                                             value = np.nan
-                            elif var == "airTemperatureAt2M" or var == "airTemperature":
+                            elif var == "airTemperatureAt2M" or var == "airTemperature" or var == "#1#airTemperature":
                                 if np.isnan(t2m):
                                     if not np.isnan(t):
                                         value = t
