@@ -199,8 +199,14 @@ class BufrObservationSet(surfex.obs.ObservationSet):
                         block_number = val
                     if key == "airTemperatureAt2M":
                         t2m = val
-                    if key == "airTemperature"  or (np.isnan(t2m) and key == "#1#airTemperature"):
+                    if key == "airTemperature":
                         t2m = val
+                    if np.isnan(t2m) and key == "#1#airTemperature": #If there is no key = airTemperature, try #1#airTemperature
+                        try:
+                            num = eccodes.codes_get_size(bufr, 'airTemperature') #How many replications of this key are there in this message
+                            if num == 2: t2m = val #If 2 replications: probably bufr template 307096: Use the first airtemp in message (#1#airTemperature)
+                        except eccodes.CodesInternalError:
+                            if debug: print('Report does not contain key="%s"' % (key))
                     if key == "/heightOfSensorAboveLocalGroundOrDeckOfMarinePlatform=2/airTemperature" or \
                             key == "/heightOfSensorAboveLocalGroundOrDeckOfMarinePlatform=1.5/airTemperature":
                         t = val
