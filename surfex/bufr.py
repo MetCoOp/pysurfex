@@ -37,8 +37,10 @@ class BufrObservationSet(surfex.obs.ObservationSet):
         # define the keys to be printed
         keys = [
             'latitude',
+            '#1#latitude',
             'localLatitude',
             'longitude',
+            '#1#longitude',
             'localLongitude',
             'year',
             'month',
@@ -63,10 +65,17 @@ class BufrObservationSet(surfex.obs.ObservationSet):
                 keys.append("/heightOfSensorAboveLocalGroundOrDeckOfMarinePlatform=1.5/airTemperature")
                 keys.append("/heightOfSensorAboveLocalGroundOrDeckOfMarinePlatform=2/dewpointTemperature")
                 keys.append("/heightOfSensorAboveLocalGroundOrDeckOfMarinePlatform=1.5/dewpointTemperature")
+            elif var == "relativeHumidity":
+                keys.append("airTemperature")
+                keys.append("#1#airTemperature")
+                keys.append("dewpointTemperature")
             elif var == "airTemperatureAt2M":
                 keys.append("airTemperatureAt2M")
                 keys.append("/heightOfSensorAboveLocalGroundOrDeckOfMarinePlatform=2/airTemperature")
                 keys.append("/heightOfSensorAboveLocalGroundOrDeckOfMarinePlatform=1.5/airTemperature")
+            elif var == "airTemperature":
+                keys.append("airTemperature")
+                keys.append("#1#airTemperature")
             else:
                 keys.append(var)
             nerror.update({var: 0})
@@ -152,12 +161,11 @@ class BufrObservationSet(surfex.obs.ObservationSet):
                         except eccodes.CodesInternalError:
                             if debug:
                                 print('Report does not contain key="%s"' % (key))
-                    
-                    if key == "latitude":
+                    if key == "latitude" or (np.isnan(lat) and key == "#1#latitude"):
                         lat = val
                         if lat < -90 or lat > 90:
                             lat = np.nan
-                    if key == "longitude":
+                    if key == "longitude" or (np.isnan(lon) and key == "#1#longitude"):
                         lon = val
                         if lon < -180 or lon > 180:
                             lon = np.nan
@@ -191,10 +199,20 @@ class BufrObservationSet(surfex.obs.ObservationSet):
                         block_number = val
                     if key == "airTemperatureAt2M":
                         t2m = val
+                    if key == "airTemperature":
+                        t2m = val
+                    if np.isnan(t2m) and key == "#1#airTemperature": #If there is no key = airTemperature, try #1#airTemperature
+                        try:
+                            num = eccodes.codes_get_size(bufr, 'airTemperature') #How many replications of this key are there in this message
+                            if num == 2: t2m = val #If 2 replications: probably bufr template 307096: Use the first airtemp in message (#1#airTemperature)
+                        except eccodes.CodesInternalError:
+                            if debug: print('Report does not contain key="%s"' % (key))
                     if key == "/heightOfSensorAboveLocalGroundOrDeckOfMarinePlatform=2/airTemperature" or \
                             key == "/heightOfSensorAboveLocalGroundOrDeckOfMarinePlatform=1.5/airTemperature":
                         t = val
                     if key == "dewpointTemperatureAt2M":
+                        td2m = val
+                    if key == "dewpointTemperature":
                         td2m = val
                     if key == "/heightOfSensorAboveLocalGroundOrDeckOfMarinePlatform=2/dewpointTemperature" or \
                             key == "/heightOfSensorAboveLocalGroundOrDeckOfMarinePlatform=1.5/dewpointTemperature":
@@ -231,7 +249,7 @@ class BufrObservationSet(surfex.obs.ObservationSet):
                         if not exists:
                             if debug:
                                 print("Pos does not exist ", pos, var)
-                            if var == "relativeHumidityAt2M":
+                            if var == "relativeHumidityAt2M" or var == "relativeHumidity":
                                 if not np.isnan(t2m) and not np.isnan(td2m):
                                     try:
                                         value = self.td2rh(td2m, t2m)
@@ -245,7 +263,7 @@ class BufrObservationSet(surfex.obs.ObservationSet):
                                             value = value * 0.01
                                         except:
                                             value = np.nan
-                            elif var == "airTemperatureAt2M":
+                            elif var == "airTemperatureAt2M" or var == "airTemperature" or var == "#1#airTemperature":
                                 if np.isnan(t2m):
                                     if not np.isnan(t):
                                         value = t
