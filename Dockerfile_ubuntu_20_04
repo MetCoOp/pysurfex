@@ -1,0 +1,15 @@
+FROM ubuntu:20.04
+
+WORKDIR /pysurfex
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update
+RUN apt-get install -y python3 python3-distutils python3-pip curl libudunits2-dev libproj-dev libeccodes0 libeccodes-dev libnetcdf-dev netcdf-bin
+
+
+# Install
+COPY . .
+
+RUN python3 -m pip install . --upgrade
+

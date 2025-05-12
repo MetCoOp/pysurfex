@@ -1,0 +1,15 @@
+{
+    "NAM_ISBA": {
+        "YSAND": "@YSAND@",
+        "YSANDFILETYPE": "@YSANDFILETYPE@",
+        "YCLAY": "@YCLAY@",
+        "YCLAYFILETYPE": "@YCLAYFILETYPE@",
+        "YSOC_TOP": "@YSOC_TOP@",
+        "YSOCFILETYPE": "@YSOCFILETYPE@",
+        "YSOC_SUB": "@YSOC_SUB@",
+        "CISBA": "@CISBA@",
+        "NGROUND_LAYER": "@NGROUND_LAYER@",
+        "NPATCH": "@NPATCH@",
+        "LMEB": "@LMEB@"
+    }
+}

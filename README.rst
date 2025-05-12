@@ -1,8 +1,6 @@
-.. _README:
 
 .. image:: https://coveralls.io/repos/github/metno/pysurfex/badge.svg?branch=master
 
-https://coveralls.io/github/metno/pysurfex
 
 Python API to SURFEX (pysurfex)
 =======================================================
@@ -11,7 +9,6 @@ An API in python to the external surface model SURFEX.
     - Prepare input and namelists to a SURFEX binary
     - Create atmospheric forcing for offline SURFEX runs
     - Read SURFEX output
-    - A scheduler setup to run offline SURFEX experiments
     - Quality control of observations with titanlib
     - Optimal interpolation with gridpp
     - Monitor the observations usage
@@ -21,17 +18,27 @@ See online documentation in https://metno.github.io/pysurfex/
 Installation of pregenerated packages from pypi (pip)
 ---------------------------------------------------------
 
+All releases will trigger an autmomatic pre-built package on pypi which can be installed by pip
+
 .. code-block:: bash
 
-    pip3 install pysurfex --use-feature=2020-resolver
+  pip3 install pysurfex
 
 User installation:
 
 .. code-block:: bash
 
-    pip3 install pysurfex --user --use-feature=2020-resolver
+  pip3 install pysurfex --user
 
 
+Run pysurfex from pre-built container
+-------------------------------------------
+
+Releases also trigger an update of the pysurfex container in the github container registry. Below is an example to run pgd without any arguments.
+
+.. code-block:: bash
+
+  podman run -it ghcr.io/metno/pysurfex:latest poetry run pgd
 
 
 Installation on debian based Linux system
@@ -42,18 +49,7 @@ Install the required pacakges (some might be obsolete if the pip packages contai
 .. code-block:: bash
 
   sudo apt-get update
-  # Python tools
-  sudo apt-get install python3-setuptools python3-numpy python3-nose
-  # Cfunits
-  sudo apt-get install libudunits2-dev
-  # Projection
-  sudo apt-get install python3-pyproj
-  # Eccodes for bufr/grib1/grib2
-  sudo apt-get install libeccodes0 libeccodes-dev
-  # Ecflow for user experiements
-  sudo apt-get install ecflow-server ecflow-client python3-ecflow
-  # Titanlib
-  sudo apt-get install libboost-dev libproj-dev libarmadillo-dev libgsl-dev
+  sudo apt-get install -y libudunits2-dev libproj-dev libeccodes0 libeccodes-dev libnetcdf-dev netcdf-bin ca-certificates
 
 The following depencies are needed. Install the non-standard ones e.g. with pip or your system installation system.
 
@@ -63,29 +59,17 @@ General dependencies (from pypi)
 .. code-block:: bash
 
   numpy
-  scipy
-  netCDF4
-  cfunits
   pyproj
   pyyaml
   toml
-  tomlkit
-  netCDF4
-  jsonmerge
-  datetime
   f90nml
-  enum34
-  requests
-  json; python_version < '3'
-  StringIO; python_version < '3'
-  eccodes
-  db-sqlite3
 
 To read NetCDF files:
 
 .. code-block:: bash
 
   NetCDF4
+  cfunits
 
 To read grib files:
 
@@ -100,7 +84,6 @@ To plot:
 .. code-block:: bash
 
   matplotlib
-  cartopy
 
 To get observations from frost.met.no API:
 
@@ -124,37 +107,48 @@ For testing:
 
 .. code-block:: bash
 
-  unittest
-  nose
-  Testdata from https://docs.google.com/uc?export=download&id=1FSNRQE998-ulBq8GZ0zZ40cP-TLrQulV
+  pytest
+
+
+Install pysurfex
+-------------------------------------------
 
 Download the source code, then install ``pysurfex`` by executing the following inside the extracted
 folder:
 
-Install pysurfex
--------------------------------------------
 .. code-block:: bash
 
-  sudo pip install -e .
+  poetry install
+
+
+This will install ``pysurfex`` in a poetry environment and this environment can be activated interactively by:
+
+.. code-block:: bash
+
+  poetry shell
 
 or
 
-.. code-block:: bash
-
-  sudo pip install -e . --user
-
-Create documentation
----------------------------------------------
+Run pysurfex client applications
+-------------------------------------------
 
 .. code-block:: bash
 
-  cd docs
-  # Create html documentation
-  make html
-  # Create latex documentation
-  make latex
-  # Create a pdf documentation
-  make latexpdf
+  poetry run [command]
+  # e.g.
+  poetry run python # will run python inside the pysurfex poetry environment
+
+
+Run pysurfex client applications
+-------------------------------------------
+.. code-block:: python
+
+  import sys
+  from pysurfex.cli import parse_args_surfex_binary, run_surfex_binary
+
+  argv = sys.argv[1:]
+  kwargs = parse_args_surfex_binary(argv, "pgd")
+  run_surfex_binary("pgd", **kwargs)
 
 
 Examples
