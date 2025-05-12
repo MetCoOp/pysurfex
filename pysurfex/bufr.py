@@ -182,8 +182,7 @@ class BufrObservationSet(ObservationSet):
                         except eccodes.CodesInternalError:
                             if debug:
                                 print('Report does not contain array of key="%s"' % (key))
-                                
-                    if np.isnan(val): 
+                    if np.isnan(val):
                         try:
                             logging.debug("Decode: %s", key)
                             val = eccodes.codes_get(bufr, key)
@@ -193,6 +192,8 @@ class BufrObservationSet(ObservationSet):
                                or val == eccodes.CODES_MISSING_LONG
                             ):
                                val = np.nan
+                        except eccodes.CodesInternalError:
+                            logging.debug('Report does not contain key="%s"', key)
                     if key == "latitude" or (np.isnan(lat) and key == "#1#latitude"):
                         lat = val
                         if lat < -90 or lat > 90:
