@@ -257,9 +257,6 @@ class BufrObservationSet(ObservationSet):
                     if key == "heightOfBaseOfCloud":
                         c_b = val
 
-                    except eccodes.CodesInternalError:
-                        logging.debug('Report does not contain key="%s"', key)
-
                 got_pos = True
                 if np.isnan(lat):
                     if np.isnan(local_lat):
