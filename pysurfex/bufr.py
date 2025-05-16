@@ -174,14 +174,12 @@ class BufrObservationSet(ObservationSet):
 
                     val = np.nan
                     if key == "heightOfBaseOfCloud":
-                        if debug:
-                                print("Decode array: ", key)
                         try:
+			    logging.debug("Decode: %s", key)
                             vals = eccodes.codes_get_array(bufr, key) #Read key as array (works if key is repeated in message)
                             val = self.get_heightOfBaseOfCloud(vals, bufr) #Get the cloud base height we want from array
                         except eccodes.CodesInternalError:
-                            if debug:
-                                print('Report does not contain array of key="%s"' % (key))
+                            logging.debug('Report does not contain key="%s"', key)                           
                     if np.isnan(val):
                         try:
                             logging.debug("Decode: %s", key)
@@ -241,7 +239,7 @@ class BufrObservationSet(ObservationSet):
                             num = eccodes.codes_get_size(bufr, 'airTemperature') #How many replications of this key are there in this message
                             if num == 2: t2m = val #If 2 replications: probably bufr template 307096: Use the first airtemp in message (#1#airTemperature)
                         except eccodes.CodesInternalError:
-                            if debug: print('Report does not contain key="%s"' % (key))
+                            logging.debug('Report does not contain key="%s"', key)                           
                     if key == "/heightOfSensorAboveLocalGroundOrDeckOfMarinePlatform=2/airTemperature" or \
                             key == "/heightOfSensorAboveLocalGroundOrDeckOfMarinePlatform=1.5/airTemperature":
                         t = val
