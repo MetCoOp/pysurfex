@@ -175,7 +175,7 @@ class BufrObservationSet(ObservationSet):
                     val = np.nan
                     if key == "heightOfBaseOfCloud":
                         try:
-			    logging.debug("Decode: %s", key)
+                            logging.debug("Decode: %s", key)
                             vals = eccodes.codes_get_array(bufr, key) #Read key as array (works if key is repeated in message)
                             val = self.get_heightOfBaseOfCloud(vals, bufr) #Get the cloud base height we want from array
                         except eccodes.CodesInternalError:
