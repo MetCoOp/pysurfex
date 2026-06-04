@@ -234,12 +234,23 @@ class BufrObservationSet(ObservationSet):
                         t2m = val
                     if key == "airTemperature":
                         t2m = val
+                        try:
+                            num = eccodes.codes_get_size(bufr, key) #How many replications of this key are there in this message
+                            if num == 2:
+                                vals = eccodes.codes_get_array(bufr,key)
+                                if vals[0] != eccodes.CODES_MISSING_DOUBLE and vals[0] != eccodes.CODES_MISSING_LONG:
+                                    t2m = vals[0] #If 2 replications: probably bufr template 307096: Use the first airtemp in message
+                        except eccodes.CodesInternalError:
+                            logging.debug('Looked for two instances of airTemperature, did not find array')
                     if np.isnan(t2m) and key == "#1#airTemperature": #If there is no key = airTemperature, try #1#airTemperature
                         try:
                             num = eccodes.codes_get_size(bufr, 'airTemperature') #How many replications of this key are there in this message
-                            if num == 2: t2m = val #If 2 replications: probably bufr template 307096: Use the first airtemp in message (#1#airTemperature)
+                            if num == 2:
+                                vals = eccodes.codes_get_array(bufr,'airTemperature')
+                                if vals[0] != eccodes.CODES_MISSING_DOUBLE and vals[0] != eccodes.CODES_MISSING_LONG:
+                                    t2m = vals[0] #If 2 replications: probably bufr template 307096: Use the first airtemp in message (#1#airTemperature)
                         except eccodes.CodesInternalError:
-                            logging.debug('Report does not contain key="%s"', key)                           
+                            logging.debug('Report does not contain key="%s"', key)
                     if key == "/heightOfSensorAboveLocalGroundOrDeckOfMarinePlatform=2/airTemperature" or \
                             key == "/heightOfSensorAboveLocalGroundOrDeckOfMarinePlatform=1.5/airTemperature":
                         t = val
